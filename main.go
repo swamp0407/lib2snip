@@ -1,7 +1,7 @@
 package main
 
 import (
-	"lib2snip/cmd"
+	"github.com/swamp0407/lib2snip/cmd"
 )
 
 func main() {

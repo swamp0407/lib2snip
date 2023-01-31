@@ -1,4 +1,4 @@
-module lib2snip
+module github.com/swamp0407/lib2snip
 
 go 1.19
 

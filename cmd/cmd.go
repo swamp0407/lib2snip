@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"lib2snip/entities"
 	"os"
 	"path/filepath"
+
+	"github.com/swamp0407/lib2snip/entities"
 
 	"errors"
 	"strings"
