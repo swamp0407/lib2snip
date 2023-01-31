@@ -257,7 +257,6 @@ func Run() {
 	}
 	filename = filepath.Join(filedir, filebase)
 
-	fmt.Println(snippetsWithScope["python"][1].Body)
 	outputSnippets(snippetsWithScope, filename)
 }
 
