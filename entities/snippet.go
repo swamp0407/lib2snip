@@ -1,32 +1,20 @@
 package entities
 
 type Snippet struct {
-	Name        string
-	Body        string
-	Prefix      string
-	Description string
-	Scope       string
+	Name        string `json:"name"`
+	Body        string `json:"body"`
+	Prefix      string `json:"prefix"`
+	Description string `json:"description"`
+	Scope       string `json:"scope"`
 }
 
-type VsSnippet struct {
-	Snippet
-}
-
-type SnippetInterface interface {
-	Output() string
-}
-
-func NewVS_Snippet(name string, body string, prefix string, description string, scope string) *VsSnippet {
-
-	body = body + ``
-	return &VsSnippet{
-		Snippet{
-			Name:        name,
-			Body:        body,
-			Prefix:      prefix,
-			Description: description,
-			Scope:       scope,
-		},
+func NewSnippet(name string, body string, prefix string, description string, scope string) *Snippet {
+	return &Snippet{
+		Name:        name,
+		Body:        body,
+		Prefix:      prefix,
+		Description: description,
+		Scope:       scope,
 	}
 }
 
