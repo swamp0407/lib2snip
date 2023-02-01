@@ -64,21 +64,13 @@ func (c *Config) ParseConfigFile() error {
 	return err
 }
 
-func validateAndEvaluatePrefix(prefix_i interface{}) (string, error) {
-	var prefix string
+func validateAndEvaluatePrefix(prefix_i interface{}) (interface{}, error) {
+	var prefix interface{}
 	switch prefix_i := prefix_i.(type) {
 	case string:
 		prefix = prefix_i
 	case []interface{}:
-		prefixList := make([]string, 0)
-		for _, v := range prefix_i {
-			if _, ok := v.(string); !ok {
-				return "", errors.New("prefix is not valid")
-			}
-
-			prefixList = append(prefixList, v.(string))
-		}
-		prefix = strings.Join(prefixList, ",")
+		return prefix_i, nil
 	default:
 		return "", nil
 	}
@@ -105,7 +97,7 @@ func (c *Config) customReadFromPath(path string) (*[]byte, error) {
 }
 
 func (c *Config) convertFile2Snippet(file File, scope string) (*entities.Snippet, error) {
-	var prefix string
+	var prefix interface{}
 	var name = file.Name
 	var description = file.Description
 	var path = file.Path
