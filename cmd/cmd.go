@@ -86,6 +86,7 @@ func Run() {
 
 	if err := c.ParseConfigFile(); err != nil {
 		fmt.Println(err)
+		usage()
 		os.Exit(1)
 	}
 
@@ -93,6 +94,12 @@ func Run() {
 	filename := processOFlag()
 	outputJson(v, filename)
 
+}
+
+func usage() {
+	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+
+	flag.PrintDefaults()
 }
 
 func init() {

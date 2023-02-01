@@ -15,7 +15,7 @@ import (
 func (c *Config) parseYamlConfig() error {
 	buf, err := os.ReadFile(c.ConfigFile)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	if err = yaml.Unmarshal(buf, c); err != nil {
 		return errors.New("error parsing Yaml config file")
