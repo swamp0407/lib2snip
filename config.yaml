@@ -2,15 +2,15 @@
 file:
   python:
     - name: sample1
-      path: ./sample/1.py
+      path: ./example/sample/1.py
       prefix:
         - sample1
         - s1
       description: sample1
     - name: sample2
-      path: ./sample/2.py
+      path: ./example/sample/2.py
       description: sample2
   go:
     - name: sample3
-      path: ./sample/3.go
+      path: ./example/sample/3.go
       description: sample3
