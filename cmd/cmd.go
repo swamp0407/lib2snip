@@ -98,6 +98,6 @@ func Run() {
 func init() {
 	flag.String("c", "config.yaml", "config file")
 	// flag.Bool("f", false, "overwrite snippets file") # not implemented
-	// flag.Bool("debug", false, "debug mode") # not implemented
+	flag.Bool("debug", false, "debug mode")
 	flag.String("o", "output.code-snippets", "output filename")
 }

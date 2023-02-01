@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -37,14 +38,16 @@ type Scope = map[string][]File
 type Config struct {
 	File       Scope `yaml:"file"`
 	ConfigFile string
+	Debug      bool
 }
 
-type VsOutput = map[string][]entities.Snippet
+type ScopedSnippets = map[string][]*entities.Snippet
+type VsOutput = map[string]*entities.Snippet
 
 func NewConfig(configFile string) Config {
-	return Config{ConfigFile: configFile}
+	debug := flag.Lookup("debug").Value.String() == "true"
+	return Config{ConfigFile: configFile, Debug: debug}
 }
-
 func (c *Config) ParseConfigFile() error {
 	var err error
 	if c.ConfigFile == "" {
@@ -82,7 +85,10 @@ func validateAndEvaluatePrefix(prefix_i interface{}) (string, error) {
 	return prefix, nil
 }
 
-func readFromPath(path string) (*[]byte, error) {
+func readFromPath(path string, debug bool) (*[]byte, error) {
+	if debug {
+		fmt.Println("read from path: ", path)
+	}
 	buf, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -94,11 +100,11 @@ func (c *Config) customReadFromPath(path string) (*[]byte, error) {
 	if !strings.HasPrefix(path, "/") {
 		path = filepath.Join(filepath.Dir(c.ConfigFile), path)
 	}
-	return readFromPath(path)
+	return readFromPath(path, c.Debug)
 
 }
 
-func (c *Config) convertFile2Snippet(file File) (*entities.Snippet, error) {
+func (c *Config) convertFile2Snippet(file File, scope string) (*entities.Snippet, error) {
 	var prefix string
 	var name = file.Name
 	var description = file.Description
@@ -109,7 +115,6 @@ func (c *Config) convertFile2Snippet(file File) (*entities.Snippet, error) {
 	if path == "" {
 		return nil, errors.New("path is required")
 	}
-	fmt.Println("path: ", path)
 	buf, err := c.customReadFromPath(path)
 	if err != nil {
 		return nil, err
@@ -126,29 +131,42 @@ func (c *Config) convertFile2Snippet(file File) (*entities.Snippet, error) {
 		Name:        name,
 		Body:        string(*buf),
 		Prefix:      prefix,
+		Scope:       scope,
 		Description: description,
 	}
 	return &snippet, nil
 }
 
-func (c *Config) genSnippets(files []File) []entities.Snippet {
-	var snippets []entities.Snippet
+func (c *Config) genSnippets(files []File, scope string) []*entities.Snippet {
+	var snippets []*entities.Snippet
 	for _, file := range files {
-		snippet, err := c.convertFile2Snippet(file)
+		snippet, err := c.convertFile2Snippet(file, scope)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		snippets = append(snippets, *snippet)
+		snippets = append(snippets, snippet)
 	}
 	return snippets
+}
+
+func (c *Config) GenOutputWithScope() ScopedSnippets {
+	output := make(ScopedSnippets)
+	for scope, files := range c.File {
+		output[scope] = make([]*entities.Snippet, 0)
+		snippets := c.genSnippets(files, scope)
+		output[scope] = append(output[scope], snippets...)
+	}
+	return output
 }
 
 func (c *Config) GenVsOutput() VsOutput {
 	output := make(VsOutput)
 	for scope, files := range c.File {
-		snippets := c.genSnippets(files)
-		output[scope] = snippets
+		snippets := c.genSnippets(files, scope)
+		for _, snippet := range snippets {
+			output[snippet.Name] = snippet
+		}
 	}
 	return output
 }
